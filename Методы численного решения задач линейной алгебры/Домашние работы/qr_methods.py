@@ -26,7 +26,7 @@ def qr_householder_effective(A):
     m, n = A.shape
     for i in range(n):
         x = curr_A[i:, i]
-        u = house(x) 
+        u = house(x)
         curr_A[i:m, i:n] -= 2 * np.outer(u, np.matmul(u, curr_A[i:m, i:n]))
         curr_A[i + 1:m, i] = u[1:]
         list_first_elements.append(u[0])

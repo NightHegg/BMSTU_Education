@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from scipy.linalg import hessenberg as hb
 from math import sqrt
+import matplotlib.pyplot as plt
 from qr_methods import implicit_householder, hessenberg_givens, implicit_givens, hessenberg_householder, qr_givens, qr_householder, qr_householder_effective
 
 def construct_delta_A(N_var, eps):
@@ -15,7 +16,7 @@ def construct_delta_A(N_var, eps):
         delta_A.append(temp)
     return np.array(delta_A)
 
-def basic_qr(A):
+def basic_algorithm(A):
     curr_A = np.copy(A)
     amnt_iters = 0
     while True:
@@ -26,7 +27,7 @@ def basic_qr(A):
             break
     return np.diag(curr_A).sort(), amnt_iters
 
-def shifting_qr(A, use_hessenberg = True):
+def shifting_algorithm(A, use_hessenberg = True):
     m, n = A.shape
     curr_A = np.copy(A)
     list_eigenval = []
@@ -51,28 +52,24 @@ def shifting_qr(A, use_hessenberg = True):
                 break
     return np.array(sorted(list_eigenval)), amnt_iters
 
-def implicit_shifting_qr(A):
-    m, n = A.shape
+def implicit_shifting_algorithm(A):
+    n, _ = A.shape
     curr_A = np.copy(A)
     list_eigenval = []
+    list_iters = []
     curr_A = hessenberg_householder(curr_A)
-    amnt_iters = 0
     for i in range(n, 0, -1):
-        lc_it = 0
-        if curr_A.size == 1:
-            list_eigenval.append(curr_A[0, 0])
+        local_iters = 1
+        if i == 1:
+            list_iters.append(local_iters)
             break
         while True:
-            curr_A = implicit_givens(curr_A)
-            lc_it += 1
-            cond = lambda elem: np.allclose(elem, np.zeros(i - 1))
-            if cond(curr_A[-1, :-1]) and cond(curr_A[:-1, -1]) or lc_it > 50:
-                amnt_iters += lc_it
-                list_eigenval.append(curr_A[-1, -1])
-                curr_A = np.copy(curr_A[:-1, :-1])
+            curr_A[:i, :i] = implicit_givens(curr_A[:i, :i])
+            if np.allclose(curr_A[:i - 1, i - 1], np.zeros(i - 1), atol = 1e-8) or local_iters > 50:
+                list_iters.append(local_iters)
                 break
-    return np.array(sorted(list_eigenval)), amnt_iters
-
+            local_iters += 1
+    return np.diag(curr_A), np.array(list_iters)
 
 def task_01(A_0, N_var, eps):
     delta_A = construct_delta_A(N_var, eps)
@@ -85,13 +82,13 @@ def task_01(A_0, N_var, eps):
     b = A_hat @ x_0
 
     Q, R = qr_householder(A_hat)
-
     assert ((Q @ R - A_hat) < 1e-6).all(), "QR decomposition is wrong"
     x = np.linalg.inv(R) @ Q.T @ b
     value_estimation = np.linalg.norm(x - x_0) / np.linalg.norm(x_0)
 
     b_effective = np.copy(b)
     A_effective, u_first_elements = qr_householder_effective(A_hat)
+
     for i in range(10 - amnt_deletable_cols):
         u = np.hstack((u_first_elements[i], A_effective[i + 1:, i]))
         gamma = -2 * np.inner(u, b_effective[i:])
@@ -110,17 +107,24 @@ def task_02(A_0, N_var, eps):
     m, n = A_0.shape
     eigenvalue_0 = np.array([2 * (1 - np.cos(np.pi * j / (n + 1))) for j in range(1, n + 1)])
     eigenvector_0 = lambda j: np.array([sqrt(2 / (n + 1)) * np.sin(np.pi * j * k / (n + 1)) for k in range(1, n + 1)])
+
     eigenval_results = []
     eigenvec_results = []
-    
+    iters_results = []
+    iters_results_sorted = []
+
     for curr_eps in eps:
         temp_eigenvec = []
         A = A_0 + construct_delta_A(N_var, curr_eps)
-        curr_eigenvalues, iters = implicit_shifting_qr(A)
-        print(iters)
-        diff_eigenvalues = abs(curr_eigenvalues - eigenvalue_0)
+        curr_eigenvalues, list_iters = implicit_shifting_algorithm(A)
+        
+        diff_eigenvalues = abs(np.sort(curr_eigenvalues) - eigenvalue_0)
         eigenval_results.append([f"{i:.3e}" for i in diff_eigenvalues])
-        for idx, eigenval in enumerate(sorted(curr_eigenvalues)):
+
+        iters_results_sorted.append(list_iters[np.argsort(curr_eigenvalues)])
+        iters_results.append(list_iters)
+
+        for idx, eigenval in enumerate(np.sort(curr_eigenvalues)):
             y = np.linalg.solve(A - eigenval * np.identity(10), np.ones(10))
             x = y / np.linalg.norm(y)
             if np.sign(x[0]) != np.sign(eigenvector_0(idx + 1)[0]):
@@ -130,10 +134,20 @@ def task_02(A_0, N_var, eps):
 
     df_eigenval = pd.DataFrame(eigenval_results, index = [f"{curr_eps:.0e}" for curr_eps in eps]).T
     df_eigenvec = pd.DataFrame(eigenvec_results, index = [f"{curr_eps:.0e}" for curr_eps in eps]).T
+    df_iters = pd.DataFrame(iters_results, index = [f"{curr_eps:.0e}" for curr_eps in eps]).T
+    df_iters_sorted = pd.DataFrame(iters_results_sorted, index = [f"{curr_eps:.0e}" for curr_eps in eps]).T
+
+    #print(df_iters.sum(axis = 0))
+    print("Таблица итераций для собственных значений:")
+    print(df_iters.to_latex(caption = f"Таблица итераций", label = "table_iters"))
+
+    print("Таблица итераций для собственных значений (отсортированная):")
+    print(df_iters_sorted.to_latex(caption = f"Таблица итераций (отсортированная по возрастанию)", label = "table_iters_sorted"))
+
     print("Таблица погрешностей собственных значений:")
-    print(df_eigenval.to_latex())
+    print(df_eigenval.to_latex(caption = f"Таблица абсолютных погрешностей для собственных значений", label = "table_eigenvals"))
     print("\n Таблица погрешностей собственных векторов:")
-    print(df_eigenvec.to_latex())
+    print(df_eigenvec.to_latex(caption = f"Таблица норм разностей для собственных векторов", label = "table_eigenvecs"))
 
 if __name__ == "__main__":
     A_0 = np.identity(10) * 2 + np.eye(10, 10, k = -1) * -1 + np.eye(10, 10, k = 1) * -1

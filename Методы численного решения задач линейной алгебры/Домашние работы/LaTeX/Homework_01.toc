@@ -1,0 +1,26 @@
+\babel@toc {russian}{}
+\contentsline {section}{\numberline {1}Постановка домашнего задания}{2}{}%
+\contentsline {section}{\numberline {2}Задача №1}{3}{}%
+\contentsline {subsection}{\numberline {2.1}Постановка задачи}{3}{}%
+\contentsline {subsection}{\numberline {2.2}Применяемые методы}{4}{}%
+\contentsline {subsubsection}{\numberline {2.2.1}Преобразования Хаусхолдера}{4}{}%
+\contentsline {paragraph}{Описание алгоритмов}{6}{}%
+\contentsline {subparagraph}{Обычный метод}{6}{}%
+\contentsline {subparagraph}{Эффективный метод}{6}{}%
+\contentsline {subsection}{\numberline {2.3}Результаты расчётов}{8}{}%
+\contentsline {subsection}{\numberline {2.4}Код решения}{9}{}%
+\contentsline {section}{\numberline {3}Задача №2}{10}{}%
+\contentsline {subsection}{\numberline {3.1}Постановка задачи}{10}{}%
+\contentsline {subsection}{\numberline {3.2}Применяемые методы}{11}{}%
+\contentsline {subsubsection}{\numberline {3.2.1}Базовый итерационный QR-алгоритм}{11}{}%
+\contentsline {paragraph}{Описание алгоритма}{11}{}%
+\contentsline {subsubsection}{\numberline {3.2.2}Приведение матрицы к форме Хессенберга методом Хаусхолдера}{12}{}%
+\contentsline {subsubsection}{\numberline {3.2.3}Итерационный QR-алгоритм со сдвигом}{13}{}%
+\contentsline {paragraph}{Описание алгоритма}{13}{}%
+\contentsline {subsubsection}{\numberline {3.2.4}Метод Гивенса для неявного QR - алгоритма со сдвигом}{14}{}%
+\contentsline {paragraph}{Описание алгоритма}{14}{}%
+\contentsline {subsubsection}{\numberline {3.2.5}Неявный QR-алгоритм со сдвигом}{15}{}%
+\contentsline {paragraph}{Описание алгоритма}{15}{}%
+\contentsline {subsection}{\numberline {3.3}Результаты расчётов}{16}{}%
+\contentsline {subsection}{\numberline {3.4}Код решения}{17}{}%
+\contentsline {section}{\numberline {4}Выводы}{18}{}%

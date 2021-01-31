@@ -12,13 +12,13 @@ MaxPos.y=-1
 NormalPos.left=4
 NormalPos.top=26
 NormalPos.right=2202
-NormalPos.bottom=899
+NormalPos.bottom=847
 Class=LaTeXView
-Document=Homework_01.tex
+Document=universal_predictor.tex
 
 [Frame0_View0,0]
-TopLine=407
-Cursor=20557
+TopLine=133
+Cursor=10038
 
 [SessionInfo]
 FrameCount=1
