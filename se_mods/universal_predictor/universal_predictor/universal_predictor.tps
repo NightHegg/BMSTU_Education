@@ -17,7 +17,7 @@ Class=LaTeXView
 Document=universal_predictor.tex
 
 [Frame0_View0,0]
-TopLine=133
+TopLine=0
 Cursor=10038
 
 [SessionInfo]
